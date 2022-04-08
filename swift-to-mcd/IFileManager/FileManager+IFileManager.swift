@@ -28,9 +28,12 @@ extension FileManager: IFileManager {
 		return files
 	}
 	
-	func save(_ sourceFile: SourceFile) {
-		let filePath = sourceFile.path.replacingOccurrences(of: ".swift", with: ".mcd")
-		if !createFile(atPath: filePath, contents: sourceFile.mermaidDescription.data(using: .utf8)) {
+	func save(_ sourceFiles: [SourceFile], at path: String) {
+		let filePath = path.appending("/result.mcd")
+		let result = sourceFiles.reduce("classDiagram\n") { partialResult, file in
+			partialResult.appending(file.mermaidDescription)
+		}
+		if !createFile(atPath: filePath, contents: result.data(using: .utf8)) {
 			print("File not created")
 		}
 	}

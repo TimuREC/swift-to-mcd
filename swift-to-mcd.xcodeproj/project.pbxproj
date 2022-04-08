@@ -10,15 +10,14 @@
 		FE8CE7EB27F0A7200097F586 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8CE7EA27F0A7200097F586 /* main.swift */; };
 		FE8CE7F327F0A78E0097F586 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = FE8CE7F227F0A78E0097F586 /* ArgumentParser */; };
 		FE8CE7F527F0A82F0097F586 /* Converter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8CE7F427F0A82F0097F586 /* Converter.swift */; };
-		FEDA5D1527F0B8DF00D70EC9 /* SwiftAccessModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D1427F0B8DF00D70EC9 /* SwiftAccessModifier.swift */; };
-		FEDA5D1827F0B90100D70EC9 /* SwiftCodeObjectType.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D1727F0B90100D70EC9 /* SwiftCodeObjectType.swift */; };
-		FEDA5D1A27F0B91500D70EC9 /* SwiftCodeObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D1927F0B91500D70EC9 /* SwiftCodeObject.swift */; };
 		FEDA5D1E27F0B95300D70EC9 /* SourceFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D1D27F0B95300D70EC9 /* SourceFile.swift */; };
 		FEDA5D2027F0C3E000D70EC9 /* Convert.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D1F27F0C3E000D70EC9 /* Convert.swift */; };
 		FEDA5D2227F0CAB300D70EC9 /* SourceFileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D2127F0CAB300D70EC9 /* SourceFileParser.swift */; };
 		FEDA5D2527F0CAD400D70EC9 /* SwiftSourceFileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D2427F0CAD400D70EC9 /* SwiftSourceFileParser.swift */; };
 		FEDA5D2727FCDFE500D70EC9 /* IFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D2627FCDFE500D70EC9 /* IFileManager.swift */; };
 		FEDA5D2A27FCDFFD00D70EC9 /* FileManager+IFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D2927FCDFFD00D70EC9 /* FileManager+IFileManager.swift */; };
+		FEDA5D332800DD6F00D70EC9 /* SwiftSemantics in Frameworks */ = {isa = PBXBuildFile; productRef = FEDA5D322800DD6F00D70EC9 /* SwiftSemantics */; };
+		FEDA5D392800FAD800D70EC9 /* Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D382800FAD800D70EC9 /* Generate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,21 +30,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		FEDA5D372800DF9000D70EC9 /* Embed Libraries */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Libraries";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		FE8CE7E727F0A7200097F586 /* swift-to-mcd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "swift-to-mcd"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE8CE7EA27F0A7200097F586 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		FE8CE7F427F0A82F0097F586 /* Converter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Converter.swift; sourceTree = "<group>"; };
-		FEDA5D1427F0B8DF00D70EC9 /* SwiftAccessModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftAccessModifier.swift; sourceTree = "<group>"; };
-		FEDA5D1727F0B90100D70EC9 /* SwiftCodeObjectType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftCodeObjectType.swift; sourceTree = "<group>"; };
-		FEDA5D1927F0B91500D70EC9 /* SwiftCodeObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftCodeObject.swift; sourceTree = "<group>"; };
 		FEDA5D1D27F0B95300D70EC9 /* SourceFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceFile.swift; sourceTree = "<group>"; };
 		FEDA5D1F27F0C3E000D70EC9 /* Convert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Convert.swift; sourceTree = "<group>"; };
 		FEDA5D2127F0CAB300D70EC9 /* SourceFileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceFileParser.swift; sourceTree = "<group>"; };
 		FEDA5D2427F0CAD400D70EC9 /* SwiftSourceFileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftSourceFileParser.swift; sourceTree = "<group>"; };
 		FEDA5D2627FCDFE500D70EC9 /* IFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IFileManager.swift; sourceTree = "<group>"; };
 		FEDA5D2927FCDFFD00D70EC9 /* FileManager+IFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+IFileManager.swift"; sourceTree = "<group>"; };
+		FEDA5D312800DD6300D70EC9 /* SwiftSemantics-0.3.2 */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "SwiftSemantics-0.3.2"; path = "Packages/SwiftSemantics-0.3.2"; sourceTree = "<group>"; };
+		FEDA5D382800FAD800D70EC9 /* Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Generate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FEDA5D332800DD6F00D70EC9 /* SwiftSemantics in Frameworks */,
 				FE8CE7F327F0A78E0097F586 /* ArgumentParser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -83,6 +92,7 @@
 			children = (
 				FE8CE7EA27F0A7200097F586 /* main.swift */,
 				FEDA5D1F27F0C3E000D70EC9 /* Convert.swift */,
+				FEDA5D382800FAD800D70EC9 /* Generate.swift */,
 				FE8CE7F427F0A82F0097F586 /* Converter.swift */,
 				FEDA5D2827FCDFE900D70EC9 /* IFileManager */,
 				FEDA5D2327F0CACC00D70EC9 /* SourceFileParser */,
@@ -95,7 +105,6 @@
 			isa = PBXGroup;
 			children = (
 				FEDA5D1D27F0B95300D70EC9 /* SourceFile.swift */,
-				FEDA5D2B27FCE83B00D70EC9 /* SwiftCodeObject */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -118,19 +127,10 @@
 			path = IFileManager;
 			sourceTree = "<group>";
 		};
-		FEDA5D2B27FCE83B00D70EC9 /* SwiftCodeObject */ = {
-			isa = PBXGroup;
-			children = (
-				FEDA5D1927F0B91500D70EC9 /* SwiftCodeObject.swift */,
-				FEDA5D1427F0B8DF00D70EC9 /* SwiftAccessModifier.swift */,
-				FEDA5D1727F0B90100D70EC9 /* SwiftCodeObjectType.swift */,
-			);
-			path = SwiftCodeObject;
-			sourceTree = "<group>";
-		};
 		FEDA5D2C2800DA9500D70EC9 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				FEDA5D312800DD6300D70EC9 /* SwiftSemantics-0.3.2 */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -152,6 +152,7 @@
 				FE8CE7E327F0A7200097F586 /* Sources */,
 				FE8CE7E427F0A7200097F586 /* Frameworks */,
 				FE8CE7E527F0A7200097F586 /* CopyFiles */,
+				FEDA5D372800DF9000D70EC9 /* Embed Libraries */,
 			);
 			buildRules = (
 			);
@@ -160,6 +161,7 @@
 			name = "swift-to-mcd";
 			packageProductDependencies = (
 				FE8CE7F227F0A78E0097F586 /* ArgumentParser */,
+				FEDA5D322800DD6F00D70EC9 /* SwiftSemantics */,
 			);
 			productName = "swift-to-mcd";
 			productReference = FE8CE7E727F0A7200097F586 /* swift-to-mcd */;
@@ -208,14 +210,12 @@
 			files = (
 				FEDA5D1E27F0B95300D70EC9 /* SourceFile.swift in Sources */,
 				FEDA5D2527F0CAD400D70EC9 /* SwiftSourceFileParser.swift in Sources */,
+				FEDA5D392800FAD800D70EC9 /* Generate.swift in Sources */,
 				FEDA5D2027F0C3E000D70EC9 /* Convert.swift in Sources */,
 				FE8CE7F527F0A82F0097F586 /* Converter.swift in Sources */,
-				FEDA5D1A27F0B91500D70EC9 /* SwiftCodeObject.swift in Sources */,
 				FEDA5D2A27FCDFFD00D70EC9 /* FileManager+IFileManager.swift in Sources */,
 				FEDA5D2727FCDFE500D70EC9 /* IFileManager.swift in Sources */,
 				FE8CE7EB27F0A7200097F586 /* main.swift in Sources */,
-				FEDA5D1527F0B8DF00D70EC9 /* SwiftAccessModifier.swift in Sources */,
-				FEDA5D1827F0B90100D70EC9 /* SwiftCodeObjectType.swift in Sources */,
 				FEDA5D2227F0CAB300D70EC9 /* SourceFileParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -344,6 +344,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = QZZ5827BGY;
 				ENABLE_HARDENED_RUNTIME = YES;
+				LD_RUNPATH_SEARCH_PATHS = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/swift-to-mcd",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -355,6 +360,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = QZZ5827BGY;
 				ENABLE_HARDENED_RUNTIME = YES;
+				LD_RUNPATH_SEARCH_PATHS = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/swift-to-mcd",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -399,6 +409,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = FE8CE7F127F0A78E0097F586 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
+		};
+		FEDA5D322800DD6F00D70EC9 /* SwiftSemantics */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftSemantics;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -6,15 +6,18 @@
 //
 
 import Foundation
+import SwiftSemantics
+import SwiftSyntax
 
 struct SwiftSourceFileParser: SourceFileParser {
 	
 	func parseFiles(on urls: [URL], handler: (SourceFile) -> Void) {
 		urls.forEach { url in
-			guard let string = try? String(contentsOf: url) else { return }
 			var file = SourceFile(path: url.path)
-			let codeObjects = parseFile(string)
-			file.set(codeObjects.mermaidize)
+			guard let tree = try? SyntaxParser.parse(url, diagnosticEngine: nil) else { return }
+			let collector = DeclarationCollector()
+			collector.walk(tree)
+			file.set(collector.mermaidize)
 			handler(file)
 		}
 	}
@@ -22,151 +25,43 @@ struct SwiftSourceFileParser: SourceFileParser {
 
 // MARK: - Private
 
-private extension SwiftSourceFileParser {
-	
-	func parseFile(_ text: String) -> [SwiftCodeObject] {
-		var objects: [SwiftCodeObject] = []
-		let lines = text.components(separatedBy: .newlines)
-		
-		var isInsideFuncNow = false
-		var isInsideClassNow = false
-		var funcBraceCounter = 0
-		var classBraceCounter = 0
-		
-		var methods: [String] = []
-		var parameters: [String] = []
-		
-		var currentObject: SwiftCodeObject?
-		
-		lines.forEach { line in
-			let clearLine = line.trimmingCharacters(in: .whitespaces)
-			if isInsideFuncNow {
-				if ["}", "}()"].contains(where: { clearLine.hasPrefix($0) }) {
-					funcBraceCounter -= 1
-					if funcBraceCounter == 0 {
-						isInsideFuncNow = false
-					}
-				}
-				if clearLine.contains("{") {
-					funcBraceCounter += 1
-					isInsideFuncNow = true
-				}
-			} else if isInsideClassNow, clearLine == "}" {
-				classBraceCounter -= 1
-				if classBraceCounter == 0 {
-					isInsideClassNow = false
-					currentObject?.set(parameters: parameters)
-					currentObject?.set(methods: methods)
-					guard let object = currentObject else { return }
-					objects.append(object)
-					currentObject = nil
-					methods.removeAll()
-					parameters.removeAll()
-					return
-				}
-			}
-			
-			guard clearLine.isNeedBeParsed, !isInsideFuncNow else { return }
-			
-			if clearLine.isFunc {
-				if !clearLine.hasPrefix(SwiftAccessModifier.private.rawValue) {
-					methods.append(clearLine.trimmingCharacters(in: .punctuationCharacters))
-				}
-				if clearLine.hasSuffix("{") {
-					isInsideFuncNow = true
-					funcBraceCounter += 1
-				}
-			} else if clearLine.isParameter {
-				if !clearLine.hasPrefix(SwiftAccessModifier.private.rawValue),
-				   let parameter = clearLine.components(separatedBy: " =").first?.trimmingCharacters(in: .punctuationCharacters) {
-					parameters.append(parameter)
-				}
-				if clearLine.contains("{") {
-					isInsideFuncNow = true
-					funcBraceCounter += 1
-				}
-			} else if clearLine.isClass {
-				let words = clearLine.components(separatedBy: .whitespaces)
-				var isClassNameNow = false
-				var isClassHasParents = false
-				var className: String?
-				var type: SwiftCodeObjectType?
-				var accessModifier: SwiftAccessModifier?
-				var inheritage: [String] = []
-				words.forEach { word in
-					if word == "{" {
-						isInsideClassNow = !clearLine.hasSuffix("}")
-						classBraceCounter += 1
-					} else if isClassNameNow {
-						className = word.trimmingCharacters(in: .punctuationCharacters)
-						isClassNameNow = false
-						isClassHasParents = word.hasSuffix(":")
-					} else if isClassHasParents {
-						let parent = word.trimmingCharacters(in: .punctuationCharacters)
-						if !parent.isEmpty { inheritage.append(parent) }
-					} else if let modifier = SwiftAccessModifier(rawValue: word) {
-						accessModifier = modifier
-					} else if let objectType = SwiftCodeObjectType(rawValue: word) {
-						type = objectType
-						isClassNameNow = true
-					}
-				}
-				if isClassHasParents {
-					isClassHasParents = false
-				}
-				if let className = className,
-				   let type = type {
-					currentObject = SwiftCodeObject(
-						name: className,
-						accessModifier: accessModifier ?? .internal,
-						type: type,
-						inheritage: inheritage,
-						parameters: [],
-						methods: []
-					)
-				}
-			}
-		}
-		
-		return objects
-	}
-}
+private extension DeclarationCollector {
 
-private extension String {
-	
-	var isFunc: Bool {
-		let words = self.components(separatedBy: .whitespaces)
-		for (index, word) in words.enumerated() where index < 4 {
-			if word == "func" || word.hasPrefix("init") {
-				return true
+	var mermaidize: String {
+		var result = ""
+		classes.forEach { obj in
+			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
+			obj.inheritance.forEach { parent in
+				result.append("\(parent) <-- \(obj.name)\n")
+			}
+			if obj.inheritance.isEmpty {
+				result.append("class \(obj.name){\n\t\n}\n")
 			}
 		}
-		return false
-	}
-	
-	var isParameter: Bool {
-		let words = self.components(separatedBy: .whitespaces)
-		for (index, word) in words.enumerated() where index < 4 {
-			if ["var", "let"].contains(word) {
-				return true
+		extensions.forEach { obj in
+			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
+			obj.inheritance.forEach { parent in
+				result.append("\(parent) <-- \(obj.extendedType)\n")
 			}
 		}
-		return false
-	}
-	
-	var isClass: Bool {
-		let words = self.components(separatedBy: .whitespaces)
-		for (index, word) in words.enumerated() where index < 3 {
-			if ["class", "protocol", "extension"].contains(word)  {
-				return true
+		structures.forEach { obj in
+			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
+			obj.inheritance.forEach { parent in
+				result.append("\(parent) <-- \(obj.name)\n")
+			}
+			if obj.inheritance.isEmpty {
+				result.append("class \(obj.name){\n\t<<struct>>\n}\n")
 			}
 		}
-		return false
-	}
-	
-	var isNeedBeParsed: Bool {
-		!isEmpty &&
-		!hasPrefix("//") &&
-		!hasPrefix("import ")
+		enumerations.forEach { obj in
+			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
+			obj.inheritance.forEach { parent in
+				result.append("\(parent) <-- \(obj.name)\n")
+			}
+			if obj.inheritance.isEmpty {
+				result.append("class \(obj.name){\n\t<<enum>>\n}\n")
+			}
+		}
+		return result
 	}
 }

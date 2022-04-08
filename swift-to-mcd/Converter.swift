@@ -15,7 +15,7 @@ final class Converter {
 	
 	// MARK: - Initialization
 	
-	init(fileManager: FileManager,
+	init(fileManager: IFileManager,
 		 sourceFileParser: SourceFileParser) {
 		self.fileManager = fileManager
 		self.sourceFileParser = sourceFileParser
@@ -29,9 +29,11 @@ final class Converter {
 		print("Looking for Swift files at:", targetPath)
 		let urls = fileManager.scan(path: targetPath, for: "swift")
 		print("Processing files")
+		var files: [SourceFile] = []
 		sourceFileParser.parseFiles(on: urls) { file in
-			fileManager.save(file)
+			files.append(file)
 		}
+		fileManager.save(files, at: targetPath)
 		print("DONE")
 		print("Time:", Int(startTime.timeIntervalSinceNow * -1000), "ms")
 	}

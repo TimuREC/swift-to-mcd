@@ -13,7 +13,7 @@ struct Convert: ParsableCommand {
 	static var configuration: CommandConfiguration {
 		.init(
 			commandName: "convert",
-			abstract: "Convert *.swift files to *.mcd"
+			abstract: "Convert *.swift files to result.mcd"
 		)
 	}
 	

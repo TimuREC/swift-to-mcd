@@ -10,5 +10,5 @@ import Foundation
 protocol IFileManager {
 	var currentDirectoryPath: String { get }
 	func scan(path: String, for fileExtension: String) -> [URL]
-	func save(_ sourceFile: SourceFile)
+	func save(_ sourceFiles: [SourceFile], at path: String)
 }
