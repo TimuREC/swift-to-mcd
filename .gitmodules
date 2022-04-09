@@ -1,0 +1,3 @@
+[submodule "submodules/SwiftSemantics"]
+	path = submodules/SwiftSemantics
+	url = https://github.com/SwiftDocOrg/SwiftSemantics.git
