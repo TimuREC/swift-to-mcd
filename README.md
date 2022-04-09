@@ -6,7 +6,7 @@ CLI инструмент для построения диаграмм класс
 - Для работы требуется установка [mermaid-cli]
 
 ## Author
-Timur Begishev
+Timur Begishev\
 telegram: [@t1murec]
 
 ## License
