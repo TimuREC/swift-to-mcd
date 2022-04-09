@@ -16,6 +16,7 @@ struct SwiftToMCD: ParsableCommand {
 			abstract: "Converts *.swift files to *.mcd and makes class diagram from it",
 			version: "0.0.1",
 			subcommands: [
+				Complex.self,
 				Convert.self,
 				Generate.self
 			],

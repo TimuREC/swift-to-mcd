@@ -18,6 +18,7 @@
 		FEDA5D2A27FCDFFD00D70EC9 /* FileManager+IFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D2927FCDFFD00D70EC9 /* FileManager+IFileManager.swift */; };
 		FEDA5D332800DD6F00D70EC9 /* SwiftSemantics in Frameworks */ = {isa = PBXBuildFile; productRef = FEDA5D322800DD6F00D70EC9 /* SwiftSemantics */; };
 		FEDA5D392800FAD800D70EC9 /* Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D382800FAD800D70EC9 /* Generate.swift */; };
+		FEDA5D3D28019B5300D70EC9 /* Complex.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D3C28019B5300D70EC9 /* Complex.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -54,6 +55,7 @@
 		FEDA5D2927FCDFFD00D70EC9 /* FileManager+IFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+IFileManager.swift"; sourceTree = "<group>"; };
 		FEDA5D312800DD6300D70EC9 /* SwiftSemantics-0.3.2 */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "SwiftSemantics-0.3.2"; path = "Packages/SwiftSemantics-0.3.2"; sourceTree = "<group>"; };
 		FEDA5D382800FAD800D70EC9 /* Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Generate.swift; sourceTree = "<group>"; };
+		FEDA5D3C28019B5300D70EC9 /* Complex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Complex.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +154,7 @@
 		FEDA5D3B2801965F00D70EC9 /* ParsableCommand */ = {
 			isa = PBXGroup;
 			children = (
+				FEDA5D3C28019B5300D70EC9 /* Complex.swift */,
 				FEDA5D3A2801964F00D70EC9 /* Convert */,
 				FEDA5D382800FAD800D70EC9 /* Generate.swift */,
 			);
@@ -232,6 +235,7 @@
 				FEDA5D2A27FCDFFD00D70EC9 /* FileManager+IFileManager.swift in Sources */,
 				FEDA5D2727FCDFE500D70EC9 /* IFileManager.swift in Sources */,
 				FE8CE7EB27F0A7200097F586 /* main.swift in Sources */,
+				FEDA5D3D28019B5300D70EC9 /* Complex.swift in Sources */,
 				FEDA5D2227F0CAB300D70EC9 /* SourceFileParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
