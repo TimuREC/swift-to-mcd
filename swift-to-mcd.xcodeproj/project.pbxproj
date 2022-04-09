@@ -56,6 +56,8 @@
 		FEDA5D312800DD6300D70EC9 /* SwiftSemantics-0.3.2 */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "SwiftSemantics-0.3.2"; path = "Packages/SwiftSemantics-0.3.2"; sourceTree = "<group>"; };
 		FEDA5D382800FAD800D70EC9 /* Generate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Generate.swift; sourceTree = "<group>"; };
 		FEDA5D3C28019B5300D70EC9 /* Complex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Complex.swift; sourceTree = "<group>"; };
+		FEDA5D3E28019DE100D70EC9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		FEDA5D3F28019FE300D70EC9 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +76,8 @@
 		FE8CE7DE27F0A7200097F586 = {
 			isa = PBXGroup;
 			children = (
+				FEDA5D3E28019DE100D70EC9 /* README.md */,
+				FEDA5D3F28019FE300D70EC9 /* LICENSE */,
 				FEDA5D2C2800DA9500D70EC9 /* Packages */,
 				FE8CE7E927F0A7200097F586 /* swift-to-mcd */,
 				FE8CE7E827F0A7200097F586 /* Products */,
