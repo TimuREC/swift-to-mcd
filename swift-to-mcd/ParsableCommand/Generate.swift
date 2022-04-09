@@ -22,7 +22,7 @@ struct Generate: ParsableCommand {
 		guard let url = task.currentDirectoryURL else { return }
 		let pipe = Pipe()
 		let targetFileUrl = url.appendingPathComponent("result.mcd")
-		let resultUrl = url.appendingPathComponent("output.pdf")
+		let resultUrl = url.appendingPathComponent("classDiagram.pdf")
 		
 		task.standardOutput = pipe
 		task.standardError = pipe

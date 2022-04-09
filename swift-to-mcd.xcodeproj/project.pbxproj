@@ -91,9 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				FE8CE7EA27F0A7200097F586 /* main.swift */,
-				FEDA5D1F27F0C3E000D70EC9 /* Convert.swift */,
-				FEDA5D382800FAD800D70EC9 /* Generate.swift */,
-				FE8CE7F427F0A82F0097F586 /* Converter.swift */,
+				FEDA5D3B2801965F00D70EC9 /* ParsableCommand */,
 				FEDA5D2827FCDFE900D70EC9 /* IFileManager */,
 				FEDA5D2327F0CACC00D70EC9 /* SourceFileParser */,
 				FEDA5D1627F0B8E400D70EC9 /* Model */,
@@ -140,6 +138,24 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FEDA5D3A2801964F00D70EC9 /* Convert */ = {
+			isa = PBXGroup;
+			children = (
+				FEDA5D1F27F0C3E000D70EC9 /* Convert.swift */,
+				FE8CE7F427F0A82F0097F586 /* Converter.swift */,
+			);
+			path = Convert;
+			sourceTree = "<group>";
+		};
+		FEDA5D3B2801965F00D70EC9 /* ParsableCommand */ = {
+			isa = PBXGroup;
+			children = (
+				FEDA5D3A2801964F00D70EC9 /* Convert */,
+				FEDA5D382800FAD800D70EC9 /* Generate.swift */,
+			);
+			path = ParsableCommand;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

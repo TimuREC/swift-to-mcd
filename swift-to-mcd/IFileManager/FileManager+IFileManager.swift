@@ -30,7 +30,7 @@ extension FileManager: IFileManager {
 	
 	func save(_ sourceFiles: [SourceFile], at path: String) {
 		let filePath = path.appending("/result.mcd")
-		let result = sourceFiles.reduce("classDiagram\n") { partialResult, file in
+		let result = sourceFiles.reduce("classDiagram\n\n") { partialResult, file in
 			partialResult.appending(file.mermaidDescription)
 		}
 		if !createFile(atPath: filePath, contents: result.data(using: .utf8)) {
