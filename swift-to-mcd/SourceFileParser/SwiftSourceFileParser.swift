@@ -53,36 +53,38 @@ private extension SwiftSourceFileParser {
 		var lineNumber = 0
 		while lineNumber < lines.count {
 			let line = lines[lineNumber]
-			let clearLine = line.trimmingCharacters(in: .whitespaces)
-			if classBraceCounter > 0 {
-				// TODO: Нахождение вложенных объектов, их парсинг с названием "parentClass_nestedObj"
-				currentClass.append(line + "\n")
-				if clearLine.contains("}") {
-					classBraceCounter -= 1
+			guard line.isNeedBeParsed else { lineNumber += 1; continue }
+			// TODO: Парсинг вложенных объектов с названием "parentClass_nestedObj"
+			if classBraceCounter > 0, line.isObject {
+				var subObj = ""
+				var braces = 0
+				while lineNumber < lines.count {
+					let subline = lines[lineNumber]
+					subObj.append(subline + "\n")
+					if subline.contains("}") {
+						braces -= 1
+					}
+					if subline.contains("{") {
+						braces += 1
+					}
+					lineNumber += 1
+					if braces == 0 {
+						objects.append(subObj)
+						break
+					}
 				}
-				if clearLine.contains("{") {
-					classBraceCounter += 1
-				}
-				if classBraceCounter == 0 {
-					objects.append(currentClass)
-					print(currentClass)
-					currentClass.removeAll()
-				}
-			} else if clearLine.isNeedBeParsed {
-				if clearLine.isObject {
-					currentClass.append(line + "\n")
-				}
-				if clearLine.contains("{") {
-					classBraceCounter += 1
-				}
-				if clearLine.contains("}") {
-					classBraceCounter -= 1
-				}
-				if classBraceCounter == 0 {
-					objects.append(currentClass)
-					print(currentClass)
-					currentClass.removeAll()
-				}
+			}
+			
+			currentClass.append(line + "\n")
+			if line.contains("}") {
+				classBraceCounter -= 1
+			}
+			if line.contains("{") {
+				classBraceCounter += 1
+			}
+			if classBraceCounter == 0 {
+				objects.append(currentClass)
+				currentClass.removeAll()
 			}
 			lineNumber += 1
 		}
@@ -93,7 +95,7 @@ private extension SwiftSourceFileParser {
 private extension String {
 	
 	var isObject: Bool {
-		let words = self.components(separatedBy: .whitespaces)
+		let words = self.trimmingCharacters(in: .whitespaces).components(separatedBy: .whitespaces)
 		for (index, word) in words.enumerated() where index < 3 {
 			guard ["class",
 				   "protocol",
