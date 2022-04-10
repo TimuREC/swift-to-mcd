@@ -54,34 +54,31 @@ private extension SwiftSourceFileParser {
 		while lineNumber < lines.count {
 			let line = lines[lineNumber]
 			guard line.isNeedBeParsed else { lineNumber += 1; continue }
-			// TODO: Парсинг вложенных объектов с названием "parentClass_nestedObj"
 			if classBraceCounter > 0, line.isObject {
-				var subObj = ""
-				var braces = 0
+				
+				let subObjName = line.className
+				let actualName = "\(currentClass.className)_\(subObjName)"
+				var subObj = line.replacingOccurrences(of: subObjName, with: actualName) + "\n"
+				
+				lineNumber += 1
+				var braces = subObj.contains("{") ? 1 : 0
 				while lineNumber < lines.count {
 					let subline = lines[lineNumber]
 					subObj.append(subline + "\n")
-					if subline.contains("}") {
-						braces -= 1
-					}
-					if subline.contains("{") {
-						braces += 1
-					}
+					if subline.contains("}") { braces -= 1 }
+					if subline.contains("{") { braces += 1 }
 					lineNumber += 1
 					if braces == 0 {
 						objects.append(subObj)
 						break
 					}
 				}
+				continue
 			}
 			
 			currentClass.append(line + "\n")
-			if line.contains("}") {
-				classBraceCounter -= 1
-			}
-			if line.contains("{") {
-				classBraceCounter += 1
-			}
+			if line.contains("}") { classBraceCounter -= 1 }
+			if line.contains("{") { classBraceCounter += 1 }
 			if classBraceCounter == 0 {
 				objects.append(currentClass)
 				currentClass.removeAll()
@@ -112,6 +109,20 @@ private extension String {
 		!hasPrefix("//") &&
 		!hasPrefix("import ")
 	}
+	
+	var className: String {
+		guard let words = components(separatedBy: .newlines).first?.components(separatedBy: .whitespaces),
+			  var index = words
+				.firstIndex(where: {
+			["class",
+			 "protocol",
+			 "extension",
+			 "enum",
+			 "struct"].contains($0)
+		}) else { return "" }
+		index += 1
+		return words[index].trimmingCharacters(in: .punctuationCharacters)
+	}
  }
 
 private extension DeclarationCollector {
@@ -128,17 +139,18 @@ private extension DeclarationCollector {
 		}
 		extensions.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
+			let extendedType = obj.extendedType.replacingOccurrences(of: ".", with: "_")
 			obj.inheritance.forEach { parent in
-				result.append("\(parent) <-- \(obj.extendedType)\n")
+				result.append("\(parent) <-- \(extendedType)\n")
 			}
-			result.append("class \(obj.extendedType){\n")
+			result.append("class \(extendedType){\n")
 		}
 		structures.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
 			obj.inheritance.forEach { parent in
 				result.append("\(parent) <-- \(obj.name)\n")
 			}
-			result.append("class \(obj.name){\n\t<<struct>>\n")
+			result.append("class \(obj.name){\n\t<<struct>>\n\n")
 		}
 		enumerations.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
@@ -155,14 +167,14 @@ private extension DeclarationCollector {
 			obj.inheritance.forEach { parent in
 				result.append("\(parent) <-- \(obj.name)\n")
 			}
-			result.append("class \(obj.name){\n\t<<protocol>>\n")
+			result.append("class \(obj.name){\n\t<<protocol>>\n\n")
 		}
 		if !result.isEmpty {
 			variables.forEach {
 				guard !$0.modifiers.contains(where: { $0.name == "private" }) else { return }
 				result.append("\t\($0.keyword) \($0.name): \($0.typeAnnotation ?? $0.initializedValue ?? "")\n")
 			}
-			result.append("\n")
+			result.append("\t\n")
 			functions.forEach {
 				guard !$0.modifiers.contains(where: { $0.name == "private" }) else { return }
 				result.append("\t\($0.description)\n")
