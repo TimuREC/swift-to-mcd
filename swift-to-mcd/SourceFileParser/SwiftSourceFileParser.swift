@@ -25,11 +25,15 @@ struct SwiftSourceFileParser: SourceFileParser {
 	
 	func parseFiles(on urls: [URL], handler: (SourceFile) -> Void) {
 		urls.forEach { url in
+			guard let string = try? String(contentsOf: url) else { return }
 			var file = SourceFile(path: url.path)
-			guard let tree = try? SyntaxParser.parse(url, diagnosticEngine: nil) else { return }
-			let collector = DeclarationCollector()
-			collector.walk(tree)
-			file.set(collector.mermaidize)
+			let result = parseFile(string).reduce("") { partialResult, obj in
+				guard let tree = try? SyntaxParser.parse(source: obj) else { return partialResult }
+				let collector = DeclarationCollector()
+				collector.walk(tree)
+				return partialResult.appending(collector.mermaidizeClass)
+			}
+			file.set(result)
 			handler(file)
 		}
 	}
@@ -37,42 +41,132 @@ struct SwiftSourceFileParser: SourceFileParser {
 
 // MARK: - Private
 
-private extension DeclarationCollector {
+private extension SwiftSourceFileParser {
+	
+	func parseFile(_ text: String) -> [String] {
+		let lines = text.components(separatedBy: .newlines)
+		
+		var classBraceCounter = 0
+		var objects: [String] = []
+		var currentClass = ""
+		
+		var lineNumber = 0
+		while lineNumber < lines.count {
+			let line = lines[lineNumber]
+			let clearLine = line.trimmingCharacters(in: .whitespaces)
+			if classBraceCounter > 0 {
+				// TODO: Нахождение вложенных объектов, их парсинг с названием "parentClass_nestedObj"
+				currentClass.append(line + "\n")
+				if clearLine.contains("}") {
+					classBraceCounter -= 1
+				}
+				if clearLine.contains("{") {
+					classBraceCounter += 1
+				}
+				if classBraceCounter == 0 {
+					objects.append(currentClass)
+					print(currentClass)
+					currentClass.removeAll()
+				}
+			} else if clearLine.isNeedBeParsed {
+				if clearLine.isObject {
+					currentClass.append(line + "\n")
+				}
+				if clearLine.contains("{") {
+					classBraceCounter += 1
+				}
+				if clearLine.contains("}") {
+					classBraceCounter -= 1
+				}
+				if classBraceCounter == 0 {
+					objects.append(currentClass)
+					print(currentClass)
+					currentClass.removeAll()
+				}
+			}
+			lineNumber += 1
+		}
+		return objects
+	}
+}
 
-	var mermaidize: String {
+private extension String {
+	
+	var isObject: Bool {
+		let words = self.components(separatedBy: .whitespaces)
+		for (index, word) in words.enumerated() where index < 3 {
+			guard ["class",
+				   "protocol",
+				   "extension",
+				   "enum",
+				   "struct"].contains(word) else { continue }
+			return true
+		}
+		return false
+	}
+	
+	var isNeedBeParsed: Bool {
+		!isEmpty &&
+		!hasPrefix("//") &&
+		!hasPrefix("import ")
+	}
+ }
+
+private extension DeclarationCollector {
+	
+	var mermaidizeClass: String {
 		var result = ""
+		
 		classes.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
 			obj.inheritance.forEach { parent in
 				result.append("\(parent) <-- \(obj.name)\n")
 			}
-			if obj.inheritance.isEmpty {
-				result.append("class \(obj.name){\n\t\n}\n")
-			}
+			result.append("class \(obj.name){\n")
 		}
 		extensions.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
 			obj.inheritance.forEach { parent in
 				result.append("\(parent) <-- \(obj.extendedType)\n")
 			}
+			result.append("class \(obj.extendedType){\n")
 		}
 		structures.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
 			obj.inheritance.forEach { parent in
 				result.append("\(parent) <-- \(obj.name)\n")
 			}
-			if obj.inheritance.isEmpty {
-				result.append("class \(obj.name){\n\t<<struct>>\n}\n")
-			}
+			result.append("class \(obj.name){\n\t<<struct>>\n")
 		}
 		enumerations.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
 			obj.inheritance.forEach { parent in
 				result.append("\(parent) <-- \(obj.name)\n")
 			}
-			if obj.inheritance.isEmpty {
-				result.append("class \(obj.name){\n\t<<enum>>\n}\n")
+			result.append("class \(obj.name){\n\t<<enum>>\n\n")
+			enumerationCases.forEach {
+				result.append("\t\($0.description)\n")
 			}
+		}
+		protocols.forEach { obj in
+			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
+			obj.inheritance.forEach { parent in
+				result.append("\(parent) <-- \(obj.name)\n")
+			}
+			result.append("class \(obj.name){\n\t<<protocol>>\n")
+		}
+		if !result.isEmpty {
+			variables.forEach {
+				guard !$0.modifiers.contains(where: { $0.name == "private" }) else { return }
+				result.append("\t\($0.keyword) \($0.name): \($0.typeAnnotation ?? $0.initializedValue ?? "")\n")
+			}
+			result.append("\n")
+			functions.forEach {
+				guard !$0.modifiers.contains(where: { $0.name == "private" }) else { return }
+				result.append("\t\($0.description)\n")
+			}
+			
+			result.append("}\n\n")
 		}
 		return result
 	}
