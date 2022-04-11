@@ -123,64 +123,106 @@ private extension String {
 		index += 1
 		return words[index].trimmingCharacters(in: .punctuationCharacters)
 	}
+	
+	var typeFormat: String {
+		let type = replacingOccurrences(of: "?", with: "")
+			.replacingOccurrences(of: "[", with: "")
+			.replacingOccurrences(of: "]", with: "")
+			.replacingOccurrences(of: ".", with: "_")
+		if hasPrefix("(") || hasPrefix("@escaping") {
+			return "Completion"
+		} else if let type = type.components(separatedBy: "(").first?
+					.components(separatedBy: "<").first?
+					.components(separatedBy: ":").first{
+			return type
+		}
+		return type
+	}
  }
 
 private extension DeclarationCollector {
 	
 	var mermaidizeClass: String {
 		var result = ""
+		var objectName = ""
+		var aggregations: Set<String> = []
+		var associations: Set<String> = []
 		
 		classes.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
+			objectName = obj.name
 			obj.inheritance.forEach { parent in
-				result.append("\(parent) <-- \(obj.name)\n")
+				result.append("\(parent) <|-- \(objectName)\n")
 			}
-			result.append("class \(obj.name){\n")
+			result.append("class \(objectName){\n")
 		}
 		extensions.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
-			let extendedType = obj.extendedType.replacingOccurrences(of: ".", with: "_")
+			objectName = obj.extendedType.replacingOccurrences(of: ".", with: "_")
 			obj.inheritance.forEach { parent in
-				result.append("\(parent) <-- \(extendedType)\n")
+				result.append("\(parent) <|-- \(objectName)\n")
 			}
-			result.append("class \(extendedType){\n")
+			result.append("class \(objectName){\n")
 		}
 		structures.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
+			objectName = obj.name
 			obj.inheritance.forEach { parent in
-				result.append("\(parent) <-- \(obj.name)\n")
+				result.append("\(parent) <|-- \(objectName)\n")
 			}
-			result.append("class \(obj.name){\n\t<<struct>>\n\n")
+			result.append("class \(objectName){\n\t<<struct>>\n\n")
 		}
 		enumerations.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
+			objectName = obj.name
 			obj.inheritance.forEach { parent in
-				result.append("\(parent) <-- \(obj.name)\n")
+				result.append("\(parent) <|-- \(objectName)\n")
 			}
-			result.append("class \(obj.name){\n\t<<enum>>\n\n")
+			result.append("class \(objectName){\n\t<<enum>>\n\n")
 			enumerationCases.forEach {
 				result.append("\t\($0.description)\n")
 			}
 		}
 		protocols.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
+			objectName = obj.name
 			obj.inheritance.forEach { parent in
-				result.append("\(parent) <-- \(obj.name)\n")
+				result.append("\(parent) <|-- \(objectName)\n")
 			}
-			result.append("class \(obj.name){\n\t<<protocol>>\n\n")
+			result.append("class \(objectName){\n\t<<protocol>>\n\n")
 		}
 		if !result.isEmpty {
+			initializers.forEach {
+				$0.parameters.forEach {
+					guard let type = $0.type else { return }
+					aggregations.insert(type.typeFormat)
+				}
+			}
 			variables.forEach {
 				guard !$0.modifiers.contains(where: { $0.name == "private" }) else { return }
-				result.append("\t\($0.keyword) \($0.name): \($0.typeAnnotation ?? $0.initializedValue ?? "")\n")
+				let type = $0.typeAnnotation
+				if let type = type, !aggregations.contains(type) {
+					associations.insert(type.typeFormat)
+				}
+				result.append("\t\($0.keyword) \($0.name): \(type ?? "")\n")
 			}
 			result.append("\t\n")
 			functions.forEach {
 				guard !$0.modifiers.contains(where: { $0.name == "private" }) else { return }
 				result.append("\t\($0.description)\n")
+				$0.signature.input.forEach {
+					guard let type = $0.type, !aggregations.contains(type) else { return }
+					associations.insert(type.typeFormat)
+				}
 			}
-			
-			result.append("}\n\n")
+			result.append("}\n")
+			aggregations.forEach {
+				result.append("\($0) --o \(objectName)\n")
+			}
+			associations.forEach {
+				result.append("\($0) <-- \(objectName)\n")
+			}
+			result.append("\n")
 		}
 		return result
 	}

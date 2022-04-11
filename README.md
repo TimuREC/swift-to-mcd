@@ -7,15 +7,17 @@ CLI инструмент для построения диаграмм класс
 
 ## Пример сгенерированной диаграммы по данному проекту
 ```mermaid
-  classDiagram
+classDiagram
 
-SourceFileParser <-- SwiftSourceFileParser
+SourceFileParser <|-- SwiftSourceFileParser
 class SwiftSourceFileParser{
 	<<struct>>
 
 	
 	func parseFiles(on urls: [URL], handler: (SourceFile) -> Void)
 }
+URL <-- SwiftSourceFileParser
+Completion <-- SwiftSourceFileParser
 
 class SourceFileParser{
 	<<protocol>>
@@ -23,8 +25,10 @@ class SourceFileParser{
 	
 	func parseFiles(on urls: [URL], handler: (SourceFile) -> Void)
 }
+Completion <-- SourceFileParser
+URL <-- SourceFileParser
 
-ParsableCommand <-- Complex
+ParsableCommand <|-- Complex
 class Complex{
 	<<struct>>
 
@@ -32,8 +36,9 @@ class Complex{
 	
 	func run() throws
 }
+CommandConfiguration <-- Complex
 
-ParsableCommand <-- Generate
+ParsableCommand <|-- Generate
 class Generate{
 	<<struct>>
 
@@ -41,8 +46,9 @@ class Generate{
 	
 	func run() throws
 }
+CommandConfiguration <-- Generate
 
-ParsableCommand <-- Convert
+ParsableCommand <|-- Convert
 class Convert{
 	<<struct>>
 
@@ -50,11 +56,14 @@ class Convert{
 	
 	func run() throws
 }
+CommandConfiguration <-- Convert
 
 class Converter{
 	
 	func start()
 }
+IFileManager --o Converter
+SourceFileParser --o Converter
 
 class SourceFile{
 	<<struct>>
@@ -63,14 +72,16 @@ class SourceFile{
 	
 	mutating func set(_ mermaidDescription: String)
 }
+String --o SourceFile
 
-ParsableCommand <-- SwiftToMCD
+ParsableCommand <|-- SwiftToMCD
 class SwiftToMCD{
 	<<struct>>
 
 	var configuration: CommandConfiguration
 	
 }
+CommandConfiguration <-- SwiftToMCD
 
 class IFileManager{
 	<<protocol>>
@@ -80,13 +91,17 @@ class IFileManager{
 	func scan(path: String, for fileExtension: String) -> [URL]
 	func save(_ sourceFiles: [SourceFile], at path: String)
 }
+SourceFile <-- IFileManager
+String <-- IFileManager
 
-IFileManager <-- FileManager
+IFileManager <|-- FileManager
 class FileManager{
 	
 	func scan(path: String, for fileExtension: String) -> [URL]
 	func save(_ sourceFiles: [SourceFile], at path: String)
 }
+SourceFile <-- FileManager
+String <-- FileManager
 
 ```
 
