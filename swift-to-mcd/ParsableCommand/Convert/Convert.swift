@@ -22,6 +22,13 @@ import ArgumentParser
 
 struct Convert: ParsableCommand {
 	
+	private var converter: Converter {
+		Converter(
+			fileManager: FileManager.default,
+			sourceFileParser: SwiftSourceFileParser()
+		)
+	}
+	
 	static var configuration: CommandConfiguration {
 		.init(
 			commandName: "convert",
@@ -30,10 +37,6 @@ struct Convert: ParsableCommand {
 	}
 	
 	func run() throws {
-		let converter = Converter(
-			fileManager: FileManager.default,
-			sourceFileParser: SwiftSourceFileParser()
-		)
 		converter.start()
 	}
 }

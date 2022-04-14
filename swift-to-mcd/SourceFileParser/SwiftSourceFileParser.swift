@@ -43,6 +43,42 @@ struct SwiftSourceFileParser: SourceFileParser {
 
 private extension SwiftSourceFileParser {
 	
+	private func parseObject(parentObjName: String, lines: [String], lineNumber: Int) -> (obj: [String], line: Int) {
+		var subObj = ""
+		var actualName = ""
+		var currentLine = lineNumber
+		var braces = 0
+		var objects: [String] = []
+		
+		
+		while currentLine < lines.count {
+			let line = lines[currentLine]
+			if currentLine == lineNumber {
+				let subObjName = line.className
+				actualName = "\(parentObjName)_\(subObjName)"
+				subObj = line.replacingOccurrences(of: subObjName, with: actualName) + "\n"
+				if subObj.contains("{") { braces += 1 }
+				currentLine += 1
+				continue
+			}
+			if braces > 0, line.isObject {
+				let result = parseObject(parentObjName: actualName, lines: lines, lineNumber: currentLine)
+				objects += result.obj
+				currentLine = result.line
+				continue
+			}
+			subObj.append(line + "\n")
+			if line.contains("}") { braces -= 1 }
+			if line.contains("{") { braces += 1 }
+			currentLine += 1
+			if braces == 0 {
+				objects.append(subObj)
+				break
+			}
+		}
+		return (objects, currentLine)
+	}
+	
 	func parseFile(_ text: String) -> [String] {
 		let lines = text.components(separatedBy: .newlines)
 		
@@ -55,25 +91,9 @@ private extension SwiftSourceFileParser {
 			let line = lines[lineNumber]
 			guard line.isNeedBeParsed else { lineNumber += 1; continue }
 			if classBraceCounter > 0, line.isObject {
-				
-				let subObjName = line.className
-				let actualName = "\(currentClass.className)_\(subObjName)"
-				var subObj = line.replacingOccurrences(of: subObjName, with: actualName) + "\n"
-				
-				lineNumber += 1
-				var braces = subObj.contains("{") ? 1 : 0
-				while lineNumber < lines.count {
-					let subline = lines[lineNumber]
-					subObj.append(subline + "\n")
-					if subline.contains("}") { braces -= 1 }
-					if subline.contains("{") { braces += 1 }
-					lineNumber += 1
-					if braces == 0 {
-						objects.append(subObj)
-						break
-					}
-				}
-				continue
+				let result = parseObject(parentObjName: currentClass.className, lines: lines, lineNumber: lineNumber)
+				objects += result.obj
+				lineNumber = result.line
 			}
 			
 			currentClass.append(line + "\n")
@@ -124,19 +144,20 @@ private extension String {
 		return words[index].trimmingCharacters(in: .punctuationCharacters)
 	}
 	
-	var typeFormat: String {
+	var typeFormat: [String] {
 		let type = replacingOccurrences(of: "?", with: "")
 			.replacingOccurrences(of: "[", with: "")
 			.replacingOccurrences(of: "]", with: "")
 			.replacingOccurrences(of: ".", with: "_")
 		if hasPrefix("(") || hasPrefix("@escaping") {
-			return "Completion"
-		} else if let type = type.components(separatedBy: "(").first?
+			return ["Completion"]
+		} else if type.contains("("),
+				  let type = type.components(separatedBy: "(").first?
 					.components(separatedBy: "<").first?
 					.components(separatedBy: ":").first{
-			return type
+			return [type]
 		}
-		return type
+		return type.components(separatedBy: " & ")
 	}
  }
 
@@ -192,19 +213,19 @@ private extension DeclarationCollector {
 			result.append("class \(objectName){\n\t<<protocol>>\n\n")
 		}
 		if !result.isEmpty {
-			initializers.forEach {
-				$0.parameters.forEach {
-					guard let type = $0.type else { return }
-					aggregations.insert(type.typeFormat)
-				}
-			}
 			variables.forEach {
-				guard !$0.modifiers.contains(where: { $0.name == "private" }) else { return }
 				let type = $0.typeAnnotation
 				if let type = type, !aggregations.contains(type) {
-					associations.insert(type.typeFormat)
+					aggregations.formUnion(type.typeFormat)
 				}
+				guard !$0.modifiers.contains(where: { $0.name == "private" }) else { return }
 				result.append("\t\($0.keyword) \($0.name): \(type ?? "")\n")
+			}
+			initializers.forEach {
+				$0.parameters.forEach {
+					guard let type = $0.type, !aggregations.contains(type) else { return }
+					associations.formUnion(type.typeFormat)
+				}
 			}
 			result.append("\t\n")
 			functions.forEach {
@@ -212,7 +233,7 @@ private extension DeclarationCollector {
 				result.append("\t\($0.description)\n")
 				$0.signature.input.forEach {
 					guard let type = $0.type, !aggregations.contains(type) else { return }
-					associations.insert(type.typeFormat)
+					associations.formUnion(type.typeFormat)
 				}
 			}
 			result.append("}\n")
