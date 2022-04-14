@@ -16,8 +16,8 @@ class SwiftSourceFileParser{
 	
 	func parseFiles(on urls: [URL], handler: (SourceFile) -> Void)
 }
-URL <-- SwiftSourceFileParser
 Completion <-- SwiftSourceFileParser
+URL <-- SwiftSourceFileParser
 
 class SourceFileParser{
 	<<protocol>>
@@ -25,8 +25,8 @@ class SourceFileParser{
 	
 	func parseFiles(on urls: [URL], handler: (SourceFile) -> Void)
 }
-Completion <-- SourceFileParser
 URL <-- SourceFileParser
+Completion <-- SourceFileParser
 
 ParsableCommand <|-- Complex
 class Complex{
@@ -36,7 +36,7 @@ class Complex{
 	
 	func run() throws
 }
-CommandConfiguration <-- Complex
+CommandConfiguration --o Complex
 
 ParsableCommand <|-- Generate
 class Generate{
@@ -46,7 +46,7 @@ class Generate{
 	
 	func run() throws
 }
-CommandConfiguration <-- Generate
+CommandConfiguration --o Generate
 
 ParsableCommand <|-- Convert
 class Convert{
@@ -56,14 +56,15 @@ class Convert{
 	
 	func run() throws
 }
-CommandConfiguration <-- Convert
+CommandConfiguration --o Convert
+Converter --o Convert
 
 class Converter{
 	
 	func start()
 }
-IFileManager --o Converter
 SourceFileParser --o Converter
+IFileManager --o Converter
 
 class SourceFile{
 	<<struct>>
@@ -81,7 +82,7 @@ class SwiftToMCD{
 	var configuration: CommandConfiguration
 	
 }
-CommandConfiguration <-- SwiftToMCD
+CommandConfiguration --o SwiftToMCD
 
 class IFileManager{
 	<<protocol>>
@@ -91,8 +92,8 @@ class IFileManager{
 	func scan(path: String, for fileExtension: String) -> [URL]
 	func save(_ sourceFiles: [SourceFile], at path: String)
 }
+String --o IFileManager
 SourceFile <-- IFileManager
-String <-- IFileManager
 
 IFileManager <|-- FileManager
 class FileManager{
@@ -100,9 +101,8 @@ class FileManager{
 	func scan(path: String, for fileExtension: String) -> [URL]
 	func save(_ sourceFiles: [SourceFile], at path: String)
 }
-SourceFile <-- FileManager
 String <-- FileManager
-
+SourceFile <-- FileManager
 ```
 
 ## Author
