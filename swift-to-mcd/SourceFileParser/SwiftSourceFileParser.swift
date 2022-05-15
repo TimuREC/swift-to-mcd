@@ -43,7 +43,7 @@ struct SwiftSourceFileParser: SourceFileParser {
 
 private extension SwiftSourceFileParser {
 	
-	private func parseObject(parentObjName: String, lines: [String], lineNumber: Int) -> (obj: [String], line: Int) {
+	func parseObject(parentObjName: String, lines: [String], lineNumber: Int) -> (obj: [String], line: Int) {
 		var subObj = ""
 		var actualName = ""
 		var currentLine = lineNumber
@@ -56,7 +56,7 @@ private extension SwiftSourceFileParser {
 			if currentLine == lineNumber {
 				let subObjName = line.className
 				actualName = "\(parentObjName)_\(subObjName)"
-				subObj = line.replacingOccurrences(of: subObjName, with: actualName) + "\n"
+				subObj = line.replacingOccurrences(of: " \(subObjName)", with: " \(actualName)") + "\n"
 				if subObj.contains("{") { braces += 1 }
 				currentLine += 1
 				continue
@@ -111,14 +111,18 @@ private extension SwiftSourceFileParser {
 
 private extension String {
 	
+	static let objectKeywords = [
+		"class",
+		"protocol",
+		"extension",
+		"enum",
+		"struct"
+	]
+	
 	var isObject: Bool {
-		let words = self.trimmingCharacters(in: .whitespaces).components(separatedBy: .whitespaces)
+		let words = trimmingCharacters(in: .whitespaces).components(separatedBy: .whitespaces)
 		for (index, word) in words.enumerated() where index < 3 {
-			guard ["class",
-				   "protocol",
-				   "extension",
-				   "enum",
-				   "struct"].contains(word) else { continue }
+			guard String.objectKeywords.contains(word) else { continue }
 			return true
 		}
 		return false
@@ -132,48 +136,45 @@ private extension String {
 	
 	var className: String {
 		guard let words = components(separatedBy: .newlines).first?.components(separatedBy: .whitespaces),
-			  var index = words
-				.firstIndex(where: {
-			["class",
-			 "protocol",
-			 "extension",
-			 "enum",
-			 "struct"].contains($0)
-		}) else { return "" }
+			  var index = words.firstIndex(where: String.objectKeywords.contains) else { return "" }
 		index += 1
 		return words[index].trimmingCharacters(in: .punctuationCharacters)
 	}
 	
 	var typeFormat: [String] {
-		let type = replacingOccurrences(of: "?", with: "")
-			.replacingOccurrences(of: "[", with: "")
-			.replacingOccurrences(of: "]", with: "")
-			.replacingOccurrences(of: ".", with: "_")
-		if hasPrefix("(") || hasPrefix("@escaping") {
-			return ["Completion"]
-		} else if type.contains("("),
-				  let type = type.components(separatedBy: "(").first?
-					.components(separatedBy: "<").first?
-					.components(separatedBy: ":").first{
-			return [type]
+		return components(separatedBy: " & ").map {
+			let type = $0.replacingOccurrences(of: "?", with: "")
+				.replacingOccurrences(of: "[", with: "")
+				.replacingOccurrences(of: "]", with: "")
+				.replacingOccurrences(of: ".", with: "_")
+			if (hasPrefix("(") && contains("->")) || hasPrefix("@escaping") {
+				return "Completion"
+			} else if type.contains("("),
+					  let type = type.components(separatedBy: "(").first?
+						.components(separatedBy: "<").first?
+						.components(separatedBy: ":").first {
+				return type
+			} else if type.hasPrefix("Set<") || type.hasPrefix("Array<") {
+				return type.replacingOccurrences(of: "<", with: "_").replacingOccurrences(of: ">", with: "")
+			}
+			return type
 		}
-		return type.components(separatedBy: " & ")
 	}
- }
+}
 
 private extension DeclarationCollector {
 	
 	var mermaidizeClass: String {
 		var result = ""
 		var objectName = ""
-		var aggregations: Set<String> = []
-		var associations: Set<String> = []
 		
 		classes.forEach { obj in
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
 			objectName = obj.name
 			obj.inheritance.forEach { parent in
-				result.append("\(parent) <|-- \(objectName)\n")
+				parent.typeFormat.forEach {
+					result.append("\($0) <|-- \(objectName)\n")
+				}
 			}
 			result.append("class \(objectName){\n")
 		}
@@ -181,7 +182,9 @@ private extension DeclarationCollector {
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
 			objectName = obj.extendedType.replacingOccurrences(of: ".", with: "_")
 			obj.inheritance.forEach { parent in
-				result.append("\(parent) <|-- \(objectName)\n")
+				parent.typeFormat.forEach {
+					result.append("\($0) <|-- \(objectName)\n")
+				}
 			}
 			result.append("class \(objectName){\n")
 		}
@@ -189,7 +192,9 @@ private extension DeclarationCollector {
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
 			objectName = obj.name
 			obj.inheritance.forEach { parent in
-				result.append("\(parent) <|-- \(objectName)\n")
+				parent.typeFormat.forEach {
+					result.append("\($0) <|-- \(objectName)\n")
+				}
 			}
 			result.append("class \(objectName){\n\t<<struct>>\n\n")
 		}
@@ -197,7 +202,9 @@ private extension DeclarationCollector {
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
 			objectName = obj.name
 			obj.inheritance.forEach { parent in
-				result.append("\(parent) <|-- \(objectName)\n")
+				parent.typeFormat.forEach {
+					result.append("\($0) <|-- \(objectName)\n")
+				}
 			}
 			result.append("class \(objectName){\n\t<<enum>>\n\n")
 			enumerationCases.forEach {
@@ -208,11 +215,16 @@ private extension DeclarationCollector {
 			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
 			objectName = obj.name
 			obj.inheritance.forEach { parent in
-				result.append("\(parent) <|-- \(objectName)\n")
+				parent.typeFormat.forEach {
+					result.append("\($0) <|-- \(objectName)\n")
+				}
 			}
 			result.append("class \(objectName){\n\t<<protocol>>\n\n")
 		}
 		if !result.isEmpty {
+			var aggregations: Set<String> = []
+			var associations: Set<String> = []
+			
 			variables.forEach {
 				let type = $0.typeAnnotation
 				if let type = type, !aggregations.contains(type) {
