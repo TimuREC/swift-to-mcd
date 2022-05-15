@@ -9,3 +9,5 @@ if [ "$MMDC" = "" ]; then
 	echo "Please install it: brew install mermaid-cli"
 	exit 1
 fi
+
+open ../../swift-to-mcd.xcodeproj

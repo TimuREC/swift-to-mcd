@@ -19,7 +19,7 @@
 
 import Foundation
 import SwiftSemantics
-import SwiftSyntax
+import enum SwiftSyntax.SyntaxParser
 
 struct SwiftSourceFileParser: SourceFileParser {
 	
@@ -120,12 +120,10 @@ private extension String {
 	]
 	
 	var isObject: Bool {
-		let words = trimmingCharacters(in: .whitespaces).components(separatedBy: .whitespaces)
-		for (index, word) in words.enumerated() where index < 3 {
-			guard String.objectKeywords.contains(word) else { continue }
-			return true
-		}
-		return false
+		return trimmingCharacters(in: .whitespaces)
+			.components(separatedBy: .whitespaces)
+			.suffix(3)
+			.contains(where: String.objectKeywords.contains)
 	}
 	
 	var isNeedBeParsed: Bool {
@@ -136,127 +134,55 @@ private extension String {
 	
 	var className: String {
 		guard let words = components(separatedBy: .newlines).first?.components(separatedBy: .whitespaces),
-			  var index = words.firstIndex(where: String.objectKeywords.contains) else { return "" }
-		index += 1
-		return words[index].trimmingCharacters(in: .punctuationCharacters)
-	}
-	
-	var typeFormat: [String] {
-		return components(separatedBy: " & ").map {
-			let type = $0.replacingOccurrences(of: "?", with: "")
-				.replacingOccurrences(of: "[", with: "")
-				.replacingOccurrences(of: "]", with: "")
-				.replacingOccurrences(of: ".", with: "_")
-			if (hasPrefix("(") && contains("->")) || hasPrefix("@escaping") {
-				return "Completion"
-			} else if type.contains("("),
-					  let type = type.components(separatedBy: "(").first?
-						.components(separatedBy: "<").first?
-						.components(separatedBy: ":").first {
-				return type
-			} else if type.hasPrefix("Set<") || type.hasPrefix("Array<") {
-				return type.replacingOccurrences(of: "<", with: "_").replacingOccurrences(of: ">", with: "")
-			}
-			return type
-		}
+			  let index = words.firstIndex(where: String.objectKeywords.contains) else { return "" }
+		return words[index + 1].trimmingCharacters(in: .punctuationCharacters)
 	}
 }
 
 private extension DeclarationCollector {
 	
 	var mermaidizeClass: String {
-		var result = ""
 		var objectName = ""
-		
-		classes.forEach { obj in
-			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
+		var result = ([
+			classes,
+			extensions,
+			structures,
+			enumerations,
+			protocols
+		] as [[ObjectItem]]).flatMap({ $0 }).filter({ !$0.isPrivate }).reduce(into: "") { partialResult, obj in
 			objectName = obj.name
-			obj.inheritance.forEach { parent in
-				parent.typeFormat.forEach {
-					result.append("\($0) <|-- \(objectName)\n")
-				}
-			}
-			result.append("class \(objectName){\n")
-		}
-		extensions.forEach { obj in
-			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
-			objectName = obj.extendedType.replacingOccurrences(of: ".", with: "_")
-			obj.inheritance.forEach { parent in
-				parent.typeFormat.forEach {
-					result.append("\($0) <|-- \(objectName)\n")
-				}
-			}
-			result.append("class \(objectName){\n")
-		}
-		structures.forEach { obj in
-			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
-			objectName = obj.name
-			obj.inheritance.forEach { parent in
-				parent.typeFormat.forEach {
-					result.append("\($0) <|-- \(objectName)\n")
-				}
-			}
-			result.append("class \(objectName){\n\t<<struct>>\n\n")
-		}
-		enumerations.forEach { obj in
-			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
-			objectName = obj.name
-			obj.inheritance.forEach { parent in
-				parent.typeFormat.forEach {
-					result.append("\($0) <|-- \(objectName)\n")
-				}
-			}
-			result.append("class \(objectName){\n\t<<enum>>\n\n")
+			partialResult.append(obj.mmdInheritance)
+			partialResult.append(obj.mmdDeclaration)
+			guard obj is Enumeration else { return }
 			enumerationCases.forEach {
-				result.append("\t\($0.description)\n")
+				partialResult.append("\t\($0.description)\n")
 			}
 		}
-		protocols.forEach { obj in
-			guard !obj.modifiers.contains(where: {$0.name == "private" }) else { return }
-			objectName = obj.name
-			obj.inheritance.forEach { parent in
-				parent.typeFormat.forEach {
-					result.append("\($0) <|-- \(objectName)\n")
-				}
+		guard !result.isEmpty else { return result }
+		var aggregations: Set<String> = []
+		var associations: Set<String> = []
+		
+		variables.forEach {
+			for type in $0.typeAnnotation?.typeFormat ?? [] where type != objectName {
+				aggregations.insert(type)
 			}
-			result.append("class \(objectName){\n\t<<protocol>>\n\n")
+			guard !$0.isPrivate else { return }
+			result.append("\t\($0.keyword) \($0.name): \($0.typeAnnotation ?? "")\n")
 		}
-		if !result.isEmpty {
-			var aggregations: Set<String> = []
-			var associations: Set<String> = []
-			
-			variables.forEach {
-				let type = $0.typeAnnotation
-				if let type = type, !aggregations.contains(type) {
-					aggregations.formUnion(type.typeFormat)
-				}
-				guard !$0.modifiers.contains(where: { $0.name == "private" }) else { return }
-				result.append("\t\($0.keyword) \($0.name): \(type ?? "")\n")
-			}
-			initializers.forEach {
-				$0.parameters.forEach {
-					guard let type = $0.type, !aggregations.contains(type) else { return }
-					associations.formUnion(type.typeFormat)
-				}
-			}
-			result.append("\t\n")
-			functions.forEach {
-				guard !$0.modifiers.contains(where: { $0.name == "private" }) else { return }
-				result.append("\t\($0.description)\n")
-				$0.signature.input.forEach {
-					guard let type = $0.type, !aggregations.contains(type) else { return }
-					associations.formUnion(type.typeFormat)
-				}
-			}
-			result.append("}\n")
-			aggregations.forEach {
-				result.append("\($0) --o \(objectName)\n")
-			}
-			associations.forEach {
-				result.append("\($0) <-- \(objectName)\n")
-			}
-			result.append("\n")
+		result.append("\t\n")
+		initializers.flatMap({ $0.parameters }).flatMap({ $0.type?.typeFormat ?? [] }).filter({ !aggregations.contains($0) && $0 != objectName }).forEach {
+			associations.insert($0)
 		}
+		functions.filter({ !$0.isPrivate }).forEach {
+			result.append("\t\($0.description)\n")
+			$0.signature.input.flatMap({ $0.type?.typeFormat ?? [] }).filter({ !aggregations.contains($0) && $0 != objectName }).forEach {
+				associations.insert($0)
+			}
+		}
+		result.append("}\n")
+		aggregations.forEach { result.append("\($0) --o \(objectName)\n") }
+		associations.forEach { result.append("\($0) <-- \(objectName)\n") }
+		result.append("\n")
 		return result
 	}
 }
