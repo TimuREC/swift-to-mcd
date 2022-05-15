@@ -81,6 +81,45 @@ class ObjectItem{
 String --o ObjectItem
 ObjectType --o ObjectItem
 
+class ObjectItem{
+	var mmdInheritance: String
+	var mmdDeclaration: String
+	
+}
+String --o ObjectItem
+
+ObjectItem <|-- Class
+class Class{
+	let objectType: 
+	
+}
+
+ObjectItem <|-- Extension
+class Extension{
+	let objectType: 
+	var name: String
+	
+}
+String --o Extension
+
+ObjectItem <|-- Structure
+class Structure{
+	let objectType: 
+	
+}
+
+ObjectItem <|-- Enumeration
+class Enumeration{
+	let objectType: 
+	
+}
+
+ObjectItem <|-- Protocol
+class Protocol{
+	let objectType: 
+	
+}
+
 ParsableCommand <|-- Complex
 class Complex{
 	<<struct>>

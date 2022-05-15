@@ -69,7 +69,7 @@ private extension SwiftSourceFileParser {
 			}
 			subObj.append(line + "\n")
 			if line.contains("}") { braces -= 1 }
-			if line.contains("{") { braces += 1 }
+			if line.contains(" {") { braces += 1 }
 			currentLine += 1
 			if braces == 0 {
 				objects.append(subObj)
@@ -98,7 +98,7 @@ private extension SwiftSourceFileParser {
 			
 			currentClass.append(line + "\n")
 			if line.contains("}") { classBraceCounter -= 1 }
-			if line.contains("{") { classBraceCounter += 1 }
+			if line.contains(" {") { classBraceCounter += 1 }
 			if classBraceCounter == 0 {
 				objects.append(currentClass)
 				currentClass.removeAll()

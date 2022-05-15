@@ -31,8 +31,7 @@ struct SwiftToMCD: ParsableCommand {
 				Complex.self,
 				Convert.self,
 				Generate.self
-			],
-			defaultSubcommand: Convert.self
+			]
 		)
 	}
 }
