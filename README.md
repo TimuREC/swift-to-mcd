@@ -197,10 +197,6 @@ String <-- FileManager
 SourceFile <-- FileManager
 ```
 
-## Информация по запуску проекта для разработки
-- Склонируйте репозиторий и запустите [init.sh]\
-`./init.sh`
-
 ## Author
 Timur Begishev\
 telegram: [@t1murec]
@@ -210,7 +206,6 @@ telegram: [@t1murec]
 
 [Releases]: <https://github.com/TimuREC/swift-to-mcd/releases>
 [Mermaid live]: <https://mermaid.live/>
-[init.sh]: <https://github.com/TimuREC/swift-to-mcd/blob/main/init.sh>
 [mermaid-cli]: <https://github.com/mermaid-js/mermaid-cli>
 [@t1murec]: <https://t.me/t1murec>
 [Apache License 2.0]: <https://github.com/TimuREC/swift-to-mcd/blob/main/LICENSE>
