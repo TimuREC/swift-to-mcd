@@ -57,7 +57,8 @@ private extension SwiftSourceFileParser {
 				let subObjName = line.className
 				actualName = "\(parentObjName)_\(subObjName)"
 				subObj = line.replacingOccurrences(of: " \(subObjName)", with: " \(actualName)") + "\n"
-				if subObj.contains("{") { braces += 1 }
+				let lineForBraces = subObj.replacingOccurrences(of: "\".*[{}].*\"", with: "\"\"", options: .regularExpression)
+				braces += lineForBraces.filter({ $0 == "{" }).count - lineForBraces.filter({ $0 == "}" }).count
 				currentLine += 1
 				continue
 			}
@@ -68,8 +69,8 @@ private extension SwiftSourceFileParser {
 				continue
 			}
 			subObj.append(line + "\n")
-			if line.contains("}") { braces -= 1 }
-			if line.contains(" {") { braces += 1 }
+			let lineForBraces = line.replacingOccurrences(of: "\".*[{}].*\"", with: "\"\"", options: .regularExpression)
+			braces += lineForBraces.filter({ $0 == "{" }).count - lineForBraces.filter({ $0 == "}" }).count
 			currentLine += 1
 			if braces == 0 {
 				objects.append(subObj)
@@ -97,8 +98,8 @@ private extension SwiftSourceFileParser {
 			}
 			
 			currentClass.append(line + "\n")
-			if line.contains("}") { classBraceCounter -= 1 }
-			if line.contains(" {") { classBraceCounter += 1 }
+			let lineForBraces = line.replacingOccurrences(of: "\".*[{}].*\"", with: "\"\"", options: .regularExpression)
+			classBraceCounter += lineForBraces.filter({ $0 == "{" }).count - lineForBraces.filter({ $0 == "}" }).count
 			if classBraceCounter == 0 {
 				objects.append(currentClass)
 				currentClass.removeAll()
