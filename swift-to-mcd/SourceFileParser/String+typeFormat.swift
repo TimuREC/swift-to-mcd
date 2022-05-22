@@ -23,21 +23,32 @@ extension String {
 	
 	var typeFormat: [String] {
 		return components(separatedBy: " & ").map {
-			let type = $0.replacingOccurrences(of: "?", with: "")
+			let type = $0.replacingOccurrences(of: "?", with: "_Optional")
 				.replacingOccurrences(of: "[", with: "")
 				.replacingOccurrences(of: "]", with: "")
 				.replacingOccurrences(of: ".", with: "_")
-			if (hasPrefix("(") && contains("->")) || hasPrefix("@escaping") {
+			if isCompletion {
 				return "Completion"
+			} else if type.contains(":") {
+				return type.components(separatedBy: ":").flatMap({ $0.typeFormat }).joined(separator: "_")
 			} else if type.contains("("),
 					  let type = type.components(separatedBy: "(").first?
 						.components(separatedBy: "<").first?
 						.components(separatedBy: ":").first {
 				return type
-			} else if type.hasPrefix("Set<") || type.hasPrefix("Array<") {
+			} else if type.contains("<") {
 				return type.replacingOccurrences(of: "<", with: "_").replacingOccurrences(of: ">", with: "")
 			}
 			return type
 		}
+	}
+}
+
+// MARK: - Private
+
+private extension String {
+	
+	var isCompletion: Bool {
+		return (hasPrefix("(") && contains("->")) || hasPrefix("@escaping")
 	}
 }

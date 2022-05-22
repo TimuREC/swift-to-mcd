@@ -123,7 +123,7 @@ private extension String {
 	var isObject: Bool {
 		return trimmingCharacters(in: .whitespaces)
 			.components(separatedBy: .whitespaces)
-			.suffix(3)
+			.prefix(3)
 			.contains(where: String.objectKeywords.contains)
 	}
 	
