@@ -13,13 +13,13 @@
 		FE8CE7EB27F0A7200097F586 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8CE7EA27F0A7200097F586 /* main.swift */; };
 		FE8CE7F327F0A78E0097F586 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = FE8CE7F227F0A78E0097F586 /* ArgumentParser */; };
 		FE8CE7F527F0A82F0097F586 /* Converter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8CE7F427F0A82F0097F586 /* Converter.swift */; };
+		FE9A74BD283AD0FA00622187 /* SwiftSemantics in Frameworks */ = {isa = PBXBuildFile; productRef = FE9A74BC283AD0FA00622187 /* SwiftSemantics */; };
 		FEDA5D1E27F0B95300D70EC9 /* SourceFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D1D27F0B95300D70EC9 /* SourceFile.swift */; };
 		FEDA5D2027F0C3E000D70EC9 /* Convert.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D1F27F0C3E000D70EC9 /* Convert.swift */; };
 		FEDA5D2227F0CAB300D70EC9 /* SourceFileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D2127F0CAB300D70EC9 /* SourceFileParser.swift */; };
 		FEDA5D2527F0CAD400D70EC9 /* SwiftSourceFileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D2427F0CAD400D70EC9 /* SwiftSourceFileParser.swift */; };
 		FEDA5D2727FCDFE500D70EC9 /* IFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D2627FCDFE500D70EC9 /* IFileManager.swift */; };
 		FEDA5D2A27FCDFFD00D70EC9 /* FileManager+IFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D2927FCDFFD00D70EC9 /* FileManager+IFileManager.swift */; };
-		FEDA5D332800DD6F00D70EC9 /* SwiftSemantics in Frameworks */ = {isa = PBXBuildFile; productRef = FEDA5D322800DD6F00D70EC9 /* SwiftSemantics */; };
 		FEDA5D392800FAD800D70EC9 /* Generate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D382800FAD800D70EC9 /* Generate.swift */; };
 		FEDA5D3D28019B5300D70EC9 /* Complex.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEDA5D3C28019B5300D70EC9 /* Complex.swift */; };
 /* End PBXBuildFile section */
@@ -63,7 +63,6 @@
 		FEDA5D3C28019B5300D70EC9 /* Complex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Complex.swift; sourceTree = "<group>"; };
 		FEDA5D3E28019DE100D70EC9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		FEDA5D3F28019FE300D70EC9 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		FEDA5D402801B27E00D70EC9 /* SwiftSemantics */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SwiftSemantics; path = submodules/SwiftSemantics; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,7 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FEDA5D332800DD6F00D70EC9 /* SwiftSemantics in Frameworks */,
+				FE9A74BD283AD0FA00622187 /* SwiftSemantics in Frameworks */,
 				FE8CE7F327F0A78E0097F586 /* ArgumentParser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -143,7 +142,6 @@
 		FEDA5D2C2800DA9500D70EC9 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				FEDA5D402801B27E00D70EC9 /* SwiftSemantics */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -193,7 +191,7 @@
 			name = "swift-to-mcd";
 			packageProductDependencies = (
 				FE8CE7F227F0A78E0097F586 /* ArgumentParser */,
-				FEDA5D322800DD6F00D70EC9 /* SwiftSemantics */,
+				FE9A74BC283AD0FA00622187 /* SwiftSemantics */,
 			);
 			productName = "swift-to-mcd";
 			productReference = FE8CE7E727F0A7200097F586 /* swift-to-mcd */;
@@ -225,6 +223,7 @@
 			mainGroup = FE8CE7DE27F0A7200097F586;
 			packageReferences = (
 				FE8CE7F127F0A78E0097F586 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
+				FE9A74BB283AD0FA00622187 /* XCRemoteSwiftPackageReference "SwiftSemantics" */,
 			);
 			productRefGroup = FE8CE7E827F0A7200097F586 /* Products */;
 			projectDirPath = "";
@@ -438,6 +437,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		FE9A74BB283AD0FA00622187 /* XCRemoteSwiftPackageReference "SwiftSemantics" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftDocOrg/SwiftSemantics";
+			requirement = {
+				kind = revision;
+				revision = 7690606eec5db6b089d6a5d252013ee07cade323;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -446,8 +453,9 @@
 			package = FE8CE7F127F0A78E0097F586 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
 		};
-		FEDA5D322800DD6F00D70EC9 /* SwiftSemantics */ = {
+		FE9A74BC283AD0FA00622187 /* SwiftSemantics */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = FE9A74BB283AD0FA00622187 /* XCRemoteSwiftPackageReference "SwiftSemantics" */;
 			productName = SwiftSemantics;
 		};
 /* End XCSwiftPackageProductDependency section */

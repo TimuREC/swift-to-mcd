@@ -18,6 +18,15 @@
           "revision": "2ca29758ed04c0a209221db59f922d4faf539f03",
           "version": null
         }
+      },
+      {
+        "package": "SwiftSemantics",
+        "repositoryURL": "https://github.com/SwiftDocOrg/SwiftSemantics",
+        "state": {
+          "branch": null,
+          "revision": "7690606eec5db6b089d6a5d252013ee07cade323",
+          "version": null
+        }
       }
     ]
   },
